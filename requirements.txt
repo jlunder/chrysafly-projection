@@ -1,0 +1,8 @@
+cffi==1.12.3
+numpy==1.16.4
+pycparser==2.19
+sounddevice==0.3.13
+pytest==4.6.3
+pytest-mock==1.10.4
+coverage==4.5.3
+git+ssh://git@github.com/grantHarris/RxPY.git@v3-with-flushes#egg=rx
