@@ -2,7 +2,6 @@ from typing import List
 
 import rx
 from rx import operators as ops
-from rx.subject import Subject
 
 from step import Step
 
@@ -19,9 +18,7 @@ def intensity_steps(source, steps: List[Step]):
     """
 
     composed = source.pipe(
-        ops.flat_map(lambda event: rx.from_iterable(steps).pipe(
-            ops.map(lambda step: (step, event
-        )))),
+        ops.flat_map(lambda event: rx.from_iterable(steps).pipe(ops.map(lambda step: (step, event)))),
         ops.filter(lambda x: x[0] <= x[1]),
         ops.map(lambda x: x[0]),
     )
