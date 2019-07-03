@@ -6,8 +6,10 @@ from numbers import Number
 @total_ordering
 class Step:
 
-    step: str = 0
-    transition: str = 0
+    step_start: str = 0
+    step_end: str = 0
+    loop_start: str = 0
+    loop_end: str = 0
     threshold: int = 0
 
     def _is_valid_operand(self, other):
