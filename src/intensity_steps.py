@@ -6,7 +6,7 @@ from rx import operators as ops
 from step import Step
 
 
-def intensity_steps(source, steps: List[Step]):
+def intensity_steps(source, steps: List[Step], flushes):
     """
 
     Given an intensity value, return the list of steps
@@ -23,13 +23,7 @@ def intensity_steps(source, steps: List[Step]):
         ops.map(lambda x: x[0]),
     )
 
-    reset = composed.pipe(
-        ops.filter(lambda x: not x.step),
-        ops.merge(rx.from_iterable([1])),
-        ops.skip(1)
-    )
-
     return composed.pipe(
-        ops.distinct(flushes=reset)
+        ops.distinct(flushes=flushes)
     )
 

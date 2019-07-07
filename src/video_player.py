@@ -8,7 +8,7 @@ class VideoPlayer:
 
     logger = getLogger()
 
-    def__init__(self, video_file):
+    def __init__(self, video_file):
         self.video_file =. video_file
         VIDEO_PATH = Path(video_file)
         self.player = OMXPlayer(VIDEO_PATH)
