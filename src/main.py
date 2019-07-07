@@ -1,3 +1,5 @@
+import logging
+
 from rx.subject import Subject
 
 from audio import Audio
@@ -8,19 +10,16 @@ from config import WINDOW
 from intensity_steps import intensity_steps
 from video_player import VideoPlayer
 
+logging.basicConfig(level=logging.INFO)
 
+flushes = Subject()
 
 audio = Audio(device=SOUND_DEVICE, window=WINDOW)
+step_stream = audio.stream.pipe(
+    intensity_steps(STEPS, flushes)
+)
+
 video_player = VideoPlayer(video_file=VIDEO_FILE)
+video_player.play_stream(step_stream, flushes)
 
-subject = Subject()
-audio.stream.subscribe(lambda x: x.subscribe(lambda y: subject.on_next(y)))
 audio.start_stream()
-
-
-subject.pipe(
-    intensity_steps(STEPS)
-).subscribe(lambda step: video_player.play_step(step))
-
-
-

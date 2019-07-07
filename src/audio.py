@@ -14,9 +14,13 @@ class Audio:
     window: int = 1
     subject_: Subject = Subject()
 
-
     def start_stream(self):
 
+        run = True
+        def stop_running(*args):
+            run = False
+
+        self.subject_.subscribe(on_error=stop_running, on_completed=stop_running)
         samplerate = sd.query_devices(self.device, 'input')['default_samplerate']
 
         def callback(indata, frames, time, status):
@@ -27,12 +31,13 @@ class Audio:
                             callback=callback,
                             finished_callback=lambda: self.subject_.on_completed(),
                             samplerate=samplerate):
-            while True:
+            while run:
                 sd.sleep(1000)
 
     @property
     def stream(self):
         return self.subject_.pipe(
            ops.window_with_time(self.window),
-           ops.map(lambda x: x.pipe(ops.average(), ops.first()))
+           ops.map(lambda x: x.pipe(ops.average(), ops.first())),
+           ops.merge_all()
         )
