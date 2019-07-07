@@ -10,7 +10,7 @@ from rx.subject import Subject
 @dataclass
 class Audio:
 
-    device: int = 0
+    device: int = 1
     window: int = 1
     subject_: Subject = Subject()
 
