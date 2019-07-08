@@ -16,7 +16,7 @@ There is a set of Step objects. Each step object (see step.py) defines a single 
 2. The audio intensity "indexes" into the list of steps. If we pass a threshold we treat the "loop" as a continuous part of the video and move on to the next step.
 
     **For example:**
-    Audio is loud enough to only index into step 1: Plays step 1 loop and continues looping.
+    * Audio is loud enough to only index into step 1: Plays step 1 loop and continues looping.
     * Audio is loud enough to index into step 2: Plays step 1 loop once, plays step 1 transition once, plays step 2 loop and continues looping.
     * Audio is loud enough to index past the last step: Plays through all proceeding loops and transitions and resets back to step 1.
 
