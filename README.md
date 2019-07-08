@@ -4,7 +4,7 @@ This project is designed to be run on a Raspberry PI. It is the interactive vide
 This project requires Python 3.6+ to run. It does not work with Python 2.7! Because the PI is set to use Python 2.7 by default you will probably need to update it to prefer Python3. See:
 https://learn.sparkfun.com/tutorials/python-programming-tutorial-getting-started-with-the-raspberry-pi/configure-your-pi
 
-This project is built with a reactive programming approach and uses the RxPY library heavily. See https://rxpy.readthedocs.io/en/latest/ I forked the library as I needed to implement flushing in the distinct operator. It is implemented as part of RxJS (JavaScript version of this library) but not the Python version. requirements.txt points to my branch with the change.
+This project is built with a reactive programming approach and uses the RxPY library heavily. See https://rxpy.readthedocs.io/en/latest/ I forked the library as I needed to implement flushing in the distinct operator. It is implemented as part of RxJS (JavaScript version of this library) but not the Python version. requirements.txt points to my branch with the change. I have a PR open on the project, but its not merged yet, so we can't point to the offical pip version. 
 
 More background (language agnostic) on reactive programming can be found here: http://reactivex.io/
 
