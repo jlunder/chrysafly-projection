@@ -1,5 +1,5 @@
 # chrysalis
-This project is designed to be run on a Raspberry PI. It is interactive video component for chrysalis.
+This project is designed to be run on a Raspberry PI. It is the interactive video component for chrysalis.
 
 This project requires Python 3.6+ to run. It does not work with Python 2.7! Because the PI is set to use Python 2.7 by default you will probably need to update it to prefer Python3. See:
 https://learn.sparkfun.com/tutorials/python-programming-tutorial-getting-started-with-the-raspberry-pi/configure-your-pi
