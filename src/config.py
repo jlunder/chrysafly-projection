@@ -1,13 +1,24 @@
 from step import Step
 
-STEPS = [Step(step_start=0, step_end=10, loop_start=10, loop_end=12, threshold=0),
-         Step(step_start=12, step_end=15, loop_start=15, loop_end=20, threshold=10),
-         Step(step_start=20, step_end=25, loop_start=25, loop_end=30, threshold=40),
-         Step(step_start=30, step_end=35, loop_start=35, loop_end=40, threshold=75),
-         Step(step_start=40, step_end=45, loop_start=45, loop_end=50, threshold=100)
-        ]
+STEPS = [(0.0, 2.0),
+         (10.0, 14.0),
+         (17.0, 20.0),
+         (22.0, 24.0),
+         (30.0, 34.0),
+         (41.0, 48.0),
+         ]
 
-SOUND_DEVICE = 0
-WINDOW = 1
+SOUND_DEVICE = 1 # index into device list
+RMS_WINDOW = 0.05 # seconds 
+RMS_MIN = 1.0e-4
+RMS_MAX = 0.5e-0
 
-VIDEO_FILE = '../Exports/Metamorphosis.mp4'
+SENSE_WINDOW = 0.5 # seconds
+SENSE_SLEW_POS = 0.1 # units per second
+SENSE_SLEW_NEG = 0.1 # units per second
+SENSE_SLEW_BACKSLIDE = 0.3 # units - fall back at most this far from our high water mark
+SENSE_INACTIVE_THRESHOLD = 0.1 # normalized sense value
+SENSE_INACTIVE_TIMEOUT = 120 # seconds
+
+VIDEO_FILE = '../media/Chrysafly_timecode.mp4'
+

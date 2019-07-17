@@ -5,7 +5,7 @@ sounddevice==0.3.13
 pytest==4.6.3
 pytest-mock==1.10.4
 coverage==4.5.3
-git+ssh://git@github.com/grantHarris/RxPY.git@v3-with-flushes#egg=rx
+git+https://git@github.com/grantHarris/RxPY.git@v3-with-flushes#egg=rx
 omxplayer-wrapper
-sounddevice
+#sounddevice
 evento

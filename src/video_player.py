@@ -1,4 +1,3 @@
-
 from pathlib import Path
 from time import sleep
 
@@ -33,6 +32,8 @@ class OmxPlayerMock:
         self.playbackStatus = 'Stopped'  # ('Playing' | 'Paused' | 'Stopped')
         self.start_time = None
 
+        self.play()
+
     def hide_video(self):
         pass
 
@@ -53,7 +54,7 @@ class OmxPlayerMock:
             return 0
 
         current_position = float((datetime.utcnow() - self.start_time).total_seconds())
-        self.logger.info('current_position = {0}'.format(current_position))
+        #self.logger.info('current_position = {0}'.format(current_position))
         return current_position
 
     def stop(self):
@@ -84,51 +85,60 @@ class OmxPlayerMock:
         pass
 
 
+class LoggingPlayer:
+    def __init__(self, video_file, args=None):
+        from omxplayer.player import OMXPlayer
+        
+        self.logger = logging.getLogger('OMXPlayer')
+        self.player_ = OMXPlayer(video_file, args) if args != None else OMXPlayer(video_file)
+        self.pauseEvent = self.player_.pauseEvent
+        self.playEvent = self.player_.playEvent
+        self.stopEvent = self.player_.stopEvent
+        self.exitEvent = self.player_.exitEvent
+        self.seekEvent = self.player_.seekEvent
+        self.positionEvent = self.player_.positionEvent
+        
+        self.logger.info('Logging OMXPlayer class initiated')
 
-class VideoPlayer:
+    def hide_video(self):
+        self.player_.hide_video()
 
-    logger = getLogger()
+    def pause(self):
+        self.logger.info('Pause')
+        self.player_.pause()
 
-    def __init__(self, video_file):
+    def play(self):
+        self.logger.info('Playing')
+        self.player_.play()
 
-        try:
-            from omxplayer.player import OMXPlayer
-            self.player = OMXPlayer(Path(video_file), dbus_name='org.mpris.MediaPlayer2.omxplayer1', args=['-b', '-o', 'both'])
-        except Exception:
-            self.player = OmxPlayerMock(video_file)
+    def position(self):
+        current_position = self.player_.position()
+        self.logger.info('current_position = {0}'.format(current_position))
+        return current_position
 
-    def play_step(self, step, cancel):
-        interval = rx.interval(0.1)
-        interval_steps = rx.just(step).pipe(
-            ops.flat_map(lambda step: interval.pipe(ops.map(lambda _: step)))
-        )
+    def stop(self):
+        self.logger.info('Stop')
+        self.player_.stop()
 
-        step_done = interval_steps.pipe(
-            ops.filter(lambda step: self.player.position() >= step.step_end),
-            ops.do_action(lambda step: self.player.set_position(step.loop_start)),
-            ops.take(1)
-        )
+    def exit(self):
+        self.logger.info('Exit')
+        self.player_.exit()
 
-        loop_done = interval_steps.pipe(
-            ops.filter(lambda step: self.player.position() >= step.loop_end),
-            ops.do_action(lambda step: self.player.set_position(step.loop_start)),
-            ops.take_until(cancel.pipe(ops.skip(1)))
-        )
+    def set_position(self, val):
+        self.logger.info('Seek to %s', val)
+        self.player_.set_position(val)
 
-        return step_done.pipe(ops.merge(
-            loop_done
-        ))
+    def playback_status(self):
+        current_status = self.player.playback_status()
+        self.logger.info('current_status = {0}'.format(current_status))
+        return current_status
 
-    def play_stream(self, step_stream, flushes):
-        self.player.play()
-        play_steps = step_stream.pipe(
-            ops.flat_map(lambda step: self.play_step(step, step_stream))
-        )
+    def show_video(self):
+        self.player_.show_video()
 
-        play_steps.pipe(
-            ops.filter(lambda step: step.threshold == 100),
-            ops.do_action(lambda _: flushes.on_next(1)),
-        ).subscribe(lambda x: print('Reset!', x), lambda x: print('Error', x), lambda: print('Complete'))
+    def duration(self):
+        return self.player_.duration()
 
-        play_steps.subscribe(lambda x: print('Played step', x), lambda x: print('Error', x), lambda: print('Complete'))
+    def quit(self):
+        self.player_.quit()
 
