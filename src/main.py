@@ -7,7 +7,6 @@ from rx import operators as ops
 from rx.subject import Subject
 
 from audio import Audio
-from intensity_steps import intensity_steps
 from video_player import LoggingPlayer, OmxPlayerMock
 
 import config
@@ -97,16 +96,20 @@ class VideoPlayer:
         self.stream = stream
         self.stream.subscribe(self.play_step)
         self.reset = reset
-        self.on_player_exit(None, None)
+        self.start_player()
 
     def on_player_exit(self, player, status):
-        global quitting
-        if quitting:
-            return
-        if self.reset: self.reset()
+        return
+        #global quitting
+        #if quitting:
+        #    return
+        #if self.reset:
+        #    self.reset()
+
+    def start_player(self):
         self.player = LoggingPlayer(Path(self.video_file), args=['-b', '--no-osd'])
-        #self.player = OmxPlayerMock(self.video_file)
-        self.player.exitEvent += self.on_player_exit
+        ##self.player = OmxPlayerMock(self.video_file)
+        #self.player.exitEvent += self.on_player_exit
 
     def play_step(self, step):
         #logger.info('step: {0}'.format(step))

@@ -1,11 +1,9 @@
-from step import Step
-
 STEPS = [(0.0, 2.0),
          (10.0, 14.0),
          (17.0, 20.0),
          (22.0, 24.0),
          (30.0, 34.0),
-         (41.0, 48.0),
+         (42.0, 48.0),
          ]
 
 SOUND_DEVICE = 1 # index into device list
@@ -20,5 +18,5 @@ SENSE_SLEW_BACKSLIDE = 0.3 # units - fall back at most this far from our high wa
 SENSE_INACTIVE_THRESHOLD = 0.1 # normalized sense value
 SENSE_INACTIVE_TIMEOUT = 120 # seconds
 
-VIDEO_FILE = '../media/Chrysafly_timecode.mp4'
+VIDEO_FILE = '/home/pi/chrysalis/media/Chrysafly.mp4'
 
