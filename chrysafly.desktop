@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=Chrysafly
+Exec=lxterminal -e '/usr/bin/python3 /home/pi/chrysalis/src/main.py'
+Terminal=true
+X-KeepTerminal=true
