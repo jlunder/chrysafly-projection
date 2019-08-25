@@ -59,7 +59,6 @@ class SenseAccumulator:
         self.rms_vals = [0] * round(config.SENSE_WINDOW / config.RMS_WINDOW)
         self.sense_val = 0.0
         self.sense_high_water = 0.0
-        self.last_active_time = datetime.utcnow()
 
     def sense_accumulate(self, rms):
         global rms_vals, sense_val, sense_high_water
@@ -70,12 +69,6 @@ class SenseAccumulator:
         log_rms_norm = math.log(rms_norm)
         sense_instant = (min(log_rms_norm, 0.0) + log_rms_range) / log_rms_range
 
-        if sense_instant > config.SENSE_INACTIVE_THRESHOLD:
-            self.last_active_time = datetime.utcnow()
-        elif (datetime.utcnow() - self.last_active_time).total_seconds() > config.SENSE_INACTIVE_TIMEOUT:
-            self.logger.info('timeout - reset')
-            self.reset()
-
         if self.sense_val + sense_slew_pos_per_rms_val < sense_instant:
             self.sense_val += sense_slew_pos_per_rms_val
         elif self.sense_val - sense_slew_neg_per_rms_val > sense_instant:
@@ -85,7 +78,7 @@ class SenseAccumulator:
         self.sense_val = max(self.sense_val, self.sense_high_water - config.SENSE_SLEW_BACKSLIDE)
         self.sense_high_water = max(self.sense_val, self.sense_high_water)
         #self.logger.info('inst: {0} sense: {1}'.format(sense_instant, self.sense_val))
-        return self.sense_high_water
+        return self.sense_val
 
 
 quitting = False
@@ -96,6 +89,10 @@ class VideoPlayer:
         self.stream = stream
         self.stream.subscribe(self.play_step)
         self.reset = reset
+        
+        self.last_active_time = datetime.utcnow()
+        self.last_step_no = 0
+        
         self.start_player()
 
     def on_player_exit(self, player, status):
@@ -108,14 +105,36 @@ class VideoPlayer:
 
     def start_player(self):
         self.player = LoggingPlayer(Path(self.video_file), args=['-b', '--no-osd'])
-        ##self.player = OmxPlayerMock(self.video_file)
+        #self.player = OmxPlayerMock(self.video_file)
         #self.player.exitEvent += self.on_player_exit
 
-    def play_step(self, step):
-        #logger.info('step: {0}'.format(step))
-        if self.player.position() >= step[1]:
-            self.player.set_position(step[0])
+    def play_step(self, step_no):
+        step = config.STEPS[step_no]
+        last_step = config.STEPS[self.last_step_no]
+        
+        # if sense_instant > config.SENSE_INACTIVE_THRESHOLD:
+        if step_no > 0:
+            self.last_active_time = datetime.utcnow()
+        elif (datetime.utcnow() - self.last_active_time).total_seconds() > config.SENSE_INACTIVE_TIMEOUT:
+            logger.info('timeout - reset')
+            self.reset()
+        
+        player_pos = self.player.position()
+        
+        if (step_no > self.last_step_no and player_pos > last_step[0] and
+                (self.last_step_no + 1) < len(config.STEPS)):
+            self.last_step_no += 1
+        
+        logger.info('step: {0} last: {1}'.format(step_no, self.last_step_no))
+        if player_pos < config.STEPS[0][0]:
+            self.player.set_position(config.STEPS[0][0])
+        if player_pos >= last_step[1]:
+            self.player.set_position(last_step[0])
 
+
+def log_and(msg, val):
+    logger.info(msg)
+    return val
 
 try:
     acc = SenseAccumulator()
@@ -123,8 +142,7 @@ try:
         config.VIDEO_FILE,
         audio.rms_power.pipe(
             ops.map(acc.sense_accumulate),
-            ops.map(lambda x: min(math.floor(x * len(config.STEPS)), len(config.STEPS) - 1)),
-            ops.map(lambda x: config.STEPS[x])
+            ops.map(lambda x: log_and('sense: {0}'.format(x), min(math.floor(x * len(config.STEPS)), len(config.STEPS) - 1))),
             ),
         acc.reset)
 
